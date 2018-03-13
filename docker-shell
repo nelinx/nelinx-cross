@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -ex
+
+
+# usage docker-shell <arch> <distro> [cmd]
+
+# shared volume
+shared_repo=/Repos
+shared_home=${HOME}
+
+  arch=${1}
+distro=${2}
+   cmd=${3}
+
+if [ $# == 0 ]; then
+	#default arch and distro
+	arch=amd64
+	distro=bionic
+fi
+
+
+docker run --rm \
+	-it \
+	--privileged \
+	-h ${arch} \
+	-v ${shared_repo}:${shared_repo} \
+	-w ${PWD} \
+	${distro}:${arch} ${cmd}
