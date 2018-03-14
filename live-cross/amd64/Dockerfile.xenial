@@ -65,23 +65,23 @@ RUN apt-get install -y \
     crossbuild-essential-arm64
 
 ########################################################################
-## use no-root user camus
+## use no-root user amd64
 ########################################################################
 
-# create cross-build user camus
-RUN useradd -c 'cross-build-user' -m -d /home/camus -s /bin/bash camus
-RUN usermod -a -G sudo camus
+# create cross-build user amd64
+RUN useradd -c 'cross-build-user' -m -d /home/amd64 -s /bin/bash amd64
+RUN usermod -a -G sudo amd64
 
 # default username, can be override by docker run environment variables
-ENV USER=camus \
-    HOME=/home/camus
+ENV USER=amd64 \
+    HOME=/home/amd64
 
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i -e \
       's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
       /etc/sudoers
 
-USER camus
+USER amd64
 
 RUN git config --global user.email "camus@rtavs.com"
 RUN git config --global user.name "Kaspter Ju"
