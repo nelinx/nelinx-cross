@@ -23,7 +23,7 @@ fi
 docker run --rm \
 	-it \
 	--privileged \
-	-h ${arch} \
+	-h ${distro} \
 	-v ${shared_repo}:${shared_repo} \
 	-v ${shared_data}:${shared_data} \
 	-w ${PWD} \
