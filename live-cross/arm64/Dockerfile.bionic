@@ -58,23 +58,23 @@ ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
 ########################################################################
-## use no-root user camus
+## use no-root user arm64
 ########################################################################
 
-# create user camus
-RUN useradd -c 'cross-build-user' -m -d /home/camus -s /bin/bash camus
-RUN usermod -a -G sudo camus
+# create user arm64
+RUN useradd -c 'cross-build-user' -m -d /home/arm64 -s /bin/bash arm64
+RUN usermod -a -G sudo arm64
 
 # default username, can be override by docker run environment variables
-ENV USER=camus \
-    HOME=/home/camus
+ENV USER=arm64 \
+    HOME=/home/arm64
 
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i -e \
       's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
       /etc/sudoers
 
-USER camus
+USER arm64
 
 RUN git config --global user.email "camus@rtavs.com"
 RUN git config --global user.name "Kaspter Ju"
