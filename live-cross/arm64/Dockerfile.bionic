@@ -1,0 +1,83 @@
+# Dockerfile for building a native developing environment for arm64v8.
+#
+# (c) 2017-2018 by Kaspter Ju <camus@rtavs.com>
+#
+# To build the environment invoke
+#
+# $ docker build -t bionic:arm64 -f arm32/Dockerfile.bionic .
+#
+# This creates a docker image called "<distro>:<arch>". Note that it will
+# take a while if you are building this image the first time.
+#
+# Note that Docker requires a relatively recent Linux kernel.
+# 3.8 is the current minimum.
+#
+
+FROM arm64v8/ubuntu:bionic
+MAINTAINER Kaspter Ju "camus@rtavs.com"
+
+RUN apt-get update && \
+    apt-get install -y \
+       autoconf \
+       bc \
+       bison \
+       build-essential \
+       ccache \
+       cmake \
+       curl \
+       cpio \
+       debootstrap \
+       device-tree-compiler \
+       dosfstools \
+       flex \
+       git \
+       gperf \
+       gnupg \
+       libncurses5-dev \
+       libgl1-mesa-dev \
+       libxml2-utils \
+       libssl-dev  \
+       lunzip \
+       mtools \
+       parted \
+       pkg-config \
+       pxz \
+       rsync \
+       sudo  \
+       unzip \
+       vim \
+       wget \
+       zip \
+       zlib1g-dev && \
+    apt-get autoclean
+
+#RUN locale-gen en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+########################################################################
+## use no-root user camus
+########################################################################
+
+# create user camus
+RUN useradd -c 'cross-build-user' -m -d /home/camus -s /bin/bash camus
+RUN usermod -a -G sudo camus
+
+# default username, can be override by docker run environment variables
+ENV USER=camus \
+    HOME=/home/camus
+
+# Enable passwordless sudo for users under the "sudo" group
+RUN sed -i -e \
+      's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
+      /etc/sudoers
+
+USER camus
+
+RUN git config --global user.email "camus@rtavs.com"
+RUN git config --global user.name "Kaspter Ju"
+
+
+
