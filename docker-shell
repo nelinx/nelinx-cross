@@ -7,7 +7,7 @@ set -ex
 
 # shared volume
 shared_repo=/Repos
-shared_home=${HOME}
+shared_data=/Data
 
   arch=${1}
 distro=${2}
@@ -25,5 +25,6 @@ docker run --rm \
 	--privileged \
 	-h ${arch} \
 	-v ${shared_repo}:${shared_repo} \
+	-v ${shared_data}:${shared_data} \
 	-w ${PWD} \
 	${distro}:${arch} ${cmd}
