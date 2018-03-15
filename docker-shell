@@ -8,6 +8,8 @@ set -ex
 # shared volume
 shared_repo=/Repos
 shared_data=/Data
+shared_home=${HOME}
+shared_misc=/misc
 
   arch=${1}
 distro=${2}
@@ -26,5 +28,7 @@ docker run --rm \
 	-h ${distro} \
 	-v ${shared_repo}:${shared_repo} \
 	-v ${shared_data}:${shared_data} \
+	-v ${shared_home}:${shared_home} \
+	-v ${shared_misc}:${shared_misc} \
 	-w ${PWD} \
 	${distro}:${arch} ${cmd}
