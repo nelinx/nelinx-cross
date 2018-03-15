@@ -64,6 +64,10 @@ RUN apt-get install -y \
     crossbuild-essential-armhf \
     crossbuild-essential-arm64
 
+RUN apt-get install -y \
+        python && \
+    apt-get autoclean
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
