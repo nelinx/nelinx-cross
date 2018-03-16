@@ -69,6 +69,12 @@ RUN apt-get install -y \
         python && \
     apt-get autoclean
 
+
+RUN apt-get install -y \
+        qemu-user-static \
+        live-build && \
+    apt-get autoclean
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
