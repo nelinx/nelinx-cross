@@ -57,6 +57,15 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
+# debian package build tools
+RUN apt-get install -y \
+       devscripts \
+       fakeroot \
+       build-essential \
+       lintian \
+       debhelper && \
+    apt-get autoclean
+
 ########################################################################
 ## use no-root user arm64
 ########################################################################
