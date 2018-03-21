@@ -57,6 +57,9 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
+# upgrade system
+RUN apt-get update && apt-get upgrade -y
+
 # debian package build tools
 RUN apt-get install -y \
        devscripts \
