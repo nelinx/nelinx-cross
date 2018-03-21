@@ -65,7 +65,21 @@ RUN apt-get install -y \
        fakeroot \
        build-essential \
        lintian \
+       dh-autoreconf \
        debhelper && \
+    apt-get autoclean
+
+
+# build libdrm
+RUN apt-get install -y \
+       libudev-dev \
+       libpciaccess-dev \
+       valgrind \
+       quilt \
+       xsltproc \
+       docbook-xsl \
+       xutils-dev \
+       dh-autoreconf && \
     apt-get autoclean
 
 ########################################################################
