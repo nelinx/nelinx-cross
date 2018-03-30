@@ -62,6 +62,9 @@ ENV LANG=en_US.UTF-8 \
 # upgrade system
 RUN apt-get update && apt-get upgrade -y
 
+RUN apt-get install -y \
+       apt-utils
+
 # debian package build tools
 RUN apt-get install -y \
        devscripts \
