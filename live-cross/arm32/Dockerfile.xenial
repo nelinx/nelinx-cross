@@ -100,6 +100,13 @@ RUN usermod -a -G sudo arm32
 ENV USER=arm32 \
     HOME=/home/arm32
 
+# Setup debian-devel environment
+ENV DEBFULLNAME Kaspter Ju
+ENV DEBEMAIL camus@rtavs.com
+
+# Setup deb-src for compiling packages
+RUN find /etc/apt/sources.list* -type f -exec sed -i 'p; s/^deb /deb-src /' '{}' +
+
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i -e \
       's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
