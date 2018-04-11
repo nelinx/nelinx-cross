@@ -26,6 +26,6 @@ arm64:
 .PHONY: amd64
 amd64:
 	@echo Building amd64-cross build environment...
-	@docker build -q -t xenial:amd64 -f amd64/Dockerfile.xenial .
-	@docker build -q -t bionic:amd64 -f amd64/Dockerfile.bionic .
-	@docker build -q -t stretch:amd64 -f amd64/Dockerfile.stretch .
+	@docker build -q -t xenial:amd64 -f amd64/rtavs.xenial .
+	@docker build -q -t bionic:amd64 -f amd64/rtavs.bionic .
+	@docker build -q -t stretch:amd64 -f amd64/rtavs.stretch .
