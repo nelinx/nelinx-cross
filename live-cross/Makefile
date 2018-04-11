@@ -10,8 +10,9 @@ all: $(TARGETS)
 .PHONY: arm32
 arm32:
 	@echo Building arm32v7 environment...
-	@docker build -q -t xenial:arm32 -f arm32/Dockerfile.xenial .
-	@docker build -q -t bionic:arm32 -f arm32/Dockerfile.bionic .
+	@docker build -q -t arm32v7:bionic -f arm32/arm32v7.bionic .
+	@docker build -q -t xenial:arm32 -f arm32/rtavs.xenial .
+	@docker build -q -t bionic:arm32 -f arm32/rtavs.bionic .
 
 
 .PHONY: arm64
