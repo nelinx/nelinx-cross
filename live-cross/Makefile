@@ -18,8 +18,9 @@ arm32:
 .PHONY: arm64
 arm64:
 	@echo Building arm64v8 environment...
-	@docker build -q -t xenial:arm64 -f arm64/Dockerfile.xenial .
-	@docker build -q -t bionic:arm64 -f arm64/Dockerfile.bionic .
+	@docker build -q -t arm64v8:bionic -f arm64/arm64v8.bionic .
+	@docker build -q -t xenial:arm64 -f arm64/rtavs.xenial .
+	@docker build -q -t bionic:arm64 -f arm64/rtavs.bionic .
 
 
 .PHONY: amd64

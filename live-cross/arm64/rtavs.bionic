@@ -13,7 +13,7 @@
 # 3.8 is the current minimum.
 #
 
-FROM arm64v8/ubuntu:bionic
+FROM arm64v8:bionic
 MAINTAINER Kaspter Ju "camus@rtavs.com"
 
 RUN apt-get update && \
