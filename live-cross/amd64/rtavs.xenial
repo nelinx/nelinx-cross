@@ -73,6 +73,11 @@ RUN apt-get install -y \
         live-build && \
     apt-get autoclean
 
+# build atf
+RUN apt-get install -y \
+        gcc-arm-none-eabi && \
+    apt-get autoclean
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
