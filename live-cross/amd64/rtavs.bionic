@@ -80,6 +80,11 @@ RUN apt-get install -y \
         gcc-arm-none-eabi && \
     apt-get autoclean
 
+# build uboot.its
+RUN apt-get install -y \
+        python-pyelftools && \
+    apt-get autoclean
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
