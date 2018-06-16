@@ -13,7 +13,6 @@
 # 3.8 is the current minimum.
 #
 
-#FROM arm32v7:bionic
 FROM arm32v7/ubuntu:bionic
 MAINTAINER Kaspter Ju "camus@rtavs.com"
 
