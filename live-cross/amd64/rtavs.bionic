@@ -85,10 +85,6 @@ RUN apt-get install -y \
         python-pyelftools && \
     apt-get autoclean
 
-ADD aarch64-musl-2018.02.tar.bz2 /opt/
-RUN /opt/aarch64-musl-2018.02/relocate-sdk.sh
-ENV PATH=/opt/aarch64-musl-2018.02/bin:$PATH
-
 ########################################################################
 ## use no-root user amd64
 ########################################################################
