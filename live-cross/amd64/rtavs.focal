@@ -125,6 +125,8 @@ RUN apt-get install -y \
 # create cross-build user amd64
 RUN useradd -c 'cross-build-user' -m -d /home/amd64 -s /bin/bash amd64
 RUN usermod -a -G sudo amd64
+RUN usermod -a -G dialout amd64
+RUN usermod -a -G video amd64
 
 # default username, can be override by docker run environment variables
 ENV USER=amd64 \
