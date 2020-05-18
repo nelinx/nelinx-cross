@@ -65,9 +65,6 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-# upgrade system
-RUN apt-get update && apt-get upgrade -y
-
 # debian package build tools
 RUN apt-get install -y \
        devscripts \
@@ -90,6 +87,15 @@ RUN apt-get install -y \
        xutils-dev \
        dh-autoreconf && \
     apt-get autoclean
+
+
+#build gstreamer
+RUN apt-get install -y \
+        libgstreamer1.0-dev \
+        libgstreamer-plugins-base1.0-dev \
+        libgstreamer-plugins-good1.0-dev \
+    && apt-get autoclean
+
 
 ########################################################################
 ## use no-root user arm64
