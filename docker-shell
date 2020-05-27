@@ -10,6 +10,7 @@ shared_repo=/Repos
 shared_data=/Data
 shared_home=${HOME}
 shared_misc=/misc
+shared_opt=/opt
 shared_display=:0
 
   arch=${1}
@@ -33,5 +34,6 @@ docker run --rm \
 	-v ${shared_data}:${shared_data} \
 	-v ${shared_home}:/home/${arch} \
 	-v ${shared_misc}:${shared_misc} \
+	-v ${shared_opt}:${shared_opt} \
 	-w ${PWD} \
 	${distro}:${arch} ${cmd}
