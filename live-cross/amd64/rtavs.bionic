@@ -93,6 +93,21 @@ RUN apt-get install -y \
         python-pyelftools && \
     apt-get autoclean
 
+
+# add i386 depend
+RUN dpkg --add-architecture i386
+RUN apt-get update && \
+    apt-get install -y libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386
+
+# install linaro toolchain
+RUN wget -O /tmp/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz https://releases.linaro.org/archive/13.11/components/toolchain/binaries/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz && \
+    tar -C /opt -xf /tmp/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz && \
+    rm /tmp/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz
+
+RUN wget -O /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-elf/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz && \
+    tar -C /opt -xf /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz && \
+    rm /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
