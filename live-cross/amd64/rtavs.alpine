@@ -17,9 +17,9 @@ FROM alpine:latest as buildbase
 MAINTAINER Kaspter Ju "camus@rtavs.com"
 
 
-ARG SRT_VERSION=1.4.3
-ARG SLS_VERSION=1.4.9
-ARG GST_VERSION=1.18.4
+ENV SRT_VERSION=1.4.3
+ENV SLS_VERSION=1.4.9
+ENV GST_VERSION=1.18.4
 
 
 # local mirror
@@ -75,13 +75,10 @@ WORKDIR /tmp/srt-live-server
 RUN make
 
 
-
-
-FROM srtbase as gstreamer
-
-ARG GST_MODULE=gstreamer
-
 WORKDIR /tmp
+
+FROM srtbase as gstbase
+ARG GST_MODULE=gstreamer
 
 # GStreamer
 RUN \
@@ -102,7 +99,7 @@ RUN \
 #
 
 
-FROM gstreamer as gstbase
+FROM gstbase as libgstbase
 
 ARG GST_MODULE=gst-plugins-base
 
@@ -135,19 +132,140 @@ RUN \
 
 
 
+FROM libgstbase as libgstgood
+
+ARG GST_MODULE=gst-plugins-good
+
+RUN apk add \
+#			cairo-dev \
+			flac-dev \
+#			gdk-pixbuf-dev \
+#			gtk+3.0-dev \
+#			jack-dev\
+			lame-dev\
+#			libavc1394-dev\
+			libcaca-dev\
+#			libdv-dev\
+			libgudev-dev\
+			libice-dev\
+#			libiec61883-dev\
+			libjpeg-turbo-dev\
+			libogg-dev\
+			libpng-dev\
+			libshout-dev\
+			libsm-dev\
+			libsoup-dev\
+			libvpx-dev\
+			libxdamage-dev \
+			libxext-dev \
+			libxv-dev \
+			mpg123-dev\
+			taglib-dev \
+			v4l-utils-dev \
+			wavpack-dev \
+#			pulseaudio-dev \
+	&& git clone -c advice.detachedHead=false --quiet --depth=1 --branch=${GST_VERSION} https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+	&& meson --prefix=${PREFIX} \
+              -Dbuildtype=release \
+              -Dexamples=disabled \
+              -Dtests=disabled \
+              -Ddoc=disabled \
+              -Dpackage-origin=https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+              ${GST_MODULE} ${GST_MODULE}_build \
+	&& meson compile -C ${GST_MODULE}_build \
+	&& meson install -C ${GST_MODULE}_build
+
+
+FROM libgstgood as libgstbad
+
+ARG GST_MODULE=gst-plugins-bad
+
+RUN apk add \
+			alsa-lib-dev  \
+			bzip2-dev \
+			curl-dev \
+			faac-dev \
+			faad2-dev \
+			flite-dev \
+			glu-dev \
+			gsm-dev \
+			libass-dev \
+			libexif-dev \
+			libmodplug-dev \
+#			libsrt-dev \
+			libsrtp-dev \
+			libvdpau-dev \
+			libwebp-dev \
+			libnice-dev \
+#			libx11-dev \
+#			mesa-dev \
+			neon-dev \
+			opus-dev \
+			spandsp-dev \
+			tiff-dev \
+			x265-dev \
+#			vulkan-loader-dev \
+#			vulkan-headers \
+#			wayland-dev \
+#			wayland-protocols \
+			libusrsctp-dev \
+			pango-dev \
+			fdk-aac-dev \
+			fluidsynth-dev \
+			libde265-dev \
+			openal-soft-dev \
+			openexr-dev \
+			openjpeg-dev \
+			sbc-dev \
+			libsndfile-dev \
+#			libxkbcommon-dev \
+			zbar-dev \
+#			gtk+3.0-dev \
+			rtmpdump-dev \
+	&& git clone -c advice.detachedHead=false --quiet --depth=1 --branch=${GST_VERSION} https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+	&& meson --prefix=${PREFIX} \
+              -Dbuildtype=release \
+              -Dexamples=disabled \
+              -Dtests=disabled \
+              -Ddoc=disabled \
+              -Dsctp=enabled \
+              -Dsrt=enabled \
+              -Dpackage-origin=https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+              ${GST_MODULE} ${GST_MODULE}_build \
+	&& meson compile -C ${GST_MODULE}_build \
+	&& meson install -C ${GST_MODULE}_build
+
+
+FROM libgstbad as libgstugly
+
+ARG GST_MODULE=gst-plugins-ugly
+
+RUN apk add \
+			a52dec-dev \
+			libmpeg2-dev \
+			x264-dev \
+	&& git clone -c advice.detachedHead=false --quiet --depth=1 --branch=${GST_VERSION} https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+	&& meson --prefix=${PREFIX} \
+              -Dbuildtype=release \
+              -Dexamples=disabled \
+              -Dtests=disabled \
+              -Ddoc=disabled \
+              -Dpackage-origin=https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+              ${GST_MODULE} ${GST_MODULE}_build \
+	&& meson compile -C ${GST_MODULE}_build \
+	&& meson install -C ${GST_MODULE}_build
 
 
 
+#RUN rm -rf /tmp/gst*
 
 
+ENV GST_PLUGIN_PATH=/usr/local/lib/gstreamer-1.0/
 
-
-
-
-
-ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib64
+ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib:/usr/local/lib64
 
 
 EXPOSE 22
 
+EXPOSE 5391/udp
 
