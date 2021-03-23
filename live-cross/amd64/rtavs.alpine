@@ -13,14 +13,19 @@
 # 3.8 is the current minimum.
 #
 
-FROM alpine:latest as build
+FROM alpine:latest as buildbase
 MAINTAINER Kaspter Ju "camus@rtavs.com"
+
+
+ARG SRT_VERSION=1.4.3
+ARG SLS_VERSION=1.4.9
+ARG GST_VERSION=1.18.4
+
 
 # local mirror
 
 RUN echo "http://mirrors.aliyun.com/alpine/latest-stable/main/" > /etc/apk/repositories
 RUN echo "http://mirrors.aliyun.com/alpine/latest-stable/community/" >> /etc/apk/repositories
-
 
 RUN apk update && apk upgrade
 
@@ -33,17 +38,28 @@ RUN apk add --no-cache \
     flex \
     gettext-dev \
     git \
-    glib \
+    glib-dev \
+    gobject-introspection-dev \
+    linux-headers \
+    meson \
+    ninja \
     x264-dev \
+    orc-compiler \
+    orc-dev \
     tcl \
     tzdata \
-    linux-headers \
     openssl-dev \
     zlib-dev
 
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+
+ENV PREFIX=/usr/local
+RUN mkdir -p ${PREFIX}
+
+
+FROM buildbase as srtbase
 
 WORKDIR /tmp
 
@@ -59,10 +75,75 @@ WORKDIR /tmp/srt-live-server
 RUN make
 
 
-# install gst 
 
+
+FROM srtbase as gstreamer
+
+ARG GST_MODULE=gstreamer
+
+WORKDIR /tmp
+
+# GStreamer
+RUN \
+	git clone -c advice.detachedHead=false --quiet --depth=1 --branch=${GST_VERSION} https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+	&& meson --prefix=${PREFIX} \
+              -Dbuildtype=release \
+              -Dgst_debug=false \
+              -Dexamples=disabled \
+              -Dtests=disabled \
+              -Dbenchmarks=disabled \
+              -Dgtk_doc=disabled \
+              -Ddoc=disabled \
+              -Dpackage-origin=https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+              ${GST_MODULE} ${GST_MODULE}_build \
+	&& meson compile -C ${GST_MODULE}_build \
+	&& meson install -C ${GST_MODULE}_build
 
 #
+
+
+FROM gstreamer as gstbase
+
+ARG GST_MODULE=gst-plugins-base
+
+# GStreamer-Plugins-base
+RUN apk add \
+#			alsa-lib-dev \
+#			cdparanoia-dev \
+			expat-dev \
+#			gtk+3.0-dev \
+			libice-dev \
+			libogg-dev \
+			libsm-dev \
+			libtheora-dev \
+			libvorbis-dev \
+#			libxv-dev \
+#			mesa-dev \
+			opus-dev
+
+RUN \
+    git clone -c advice.detachedHead=false --quiet --depth=1 --branch=${GST_VERSION} https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+	&& meson --prefix=${PREFIX} \
+              -Dbuildtype=release \
+              -Dexamples=disabled \
+              -Dtests=disabled \
+              -Ddoc=disabled \
+              -Dpackage-origin=https://gitlab.freedesktop.org/gstreamer/${GST_MODULE}.git \
+              ${GST_MODULE} ${GST_MODULE}_build \
+	&& meson compile -C ${GST_MODULE}_build \
+	&& meson install -C ${GST_MODULE}_build
+
+
+
+
+
+
+
+
+
+
+
+
 
 ENV LD_LIBRARY_PATH /lib:/usr/lib:/usr/local/lib64
 
