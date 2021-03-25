@@ -28,6 +28,7 @@ docker run --rm \
 	-it \
 	--privileged \
 	-e DISPLAY=${shared_display} \
+	-p 80:80 -p 443:443 -p 1935:1935 -p 1935:1935/udp \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-h ${distro} \
 	-v ${shared_repo}:${shared_repo} \
