@@ -28,11 +28,16 @@ docker run --rm \
 	-it \
 	--privileged \
 	-e DISPLAY=${shared_display} \
-	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	-u $(id -u):$(id -g) \
 	-h ${distro} \
+	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+	-v /etc/passwd:/etc/passwd:ro \
+	-v /etc/group:/etc/group:ro \
+	-v /etc/shadow:/etc/shadow:ro \
+	-v /etc/sudoers.d:/etc/sudoers.d:ro \
 	-v ${shared_repo}:${shared_repo} \
 	-v ${shared_data}:${shared_data} \
-	-v ${shared_home}:/home/${arch} \
+	-v ${shared_home}:${shared_home} \
 	-v ${shared_misc}:${shared_misc} \
 	-v ${shared_opt}:${shared_opt} \
 	-w ${PWD} \
