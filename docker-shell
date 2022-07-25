@@ -28,6 +28,8 @@ docker run --rm \
 	-it \
 	--privileged \
 	-e DISPLAY=${shared_display} \
+	-e USER=$(id -un) \
+	-e HOME=${shared_home} \
 	-u $(id -u):$(id -g) \
 	-h ${distro} \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
