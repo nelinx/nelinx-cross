@@ -108,6 +108,18 @@ RUN wget -O /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz https://releas
     tar -C /opt -xf /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz && \
     rm /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz
 
+# for hstr
+RUN apt-get install -y \
+        libncursesw5-dev \
+        libreadline-dev && \
+    apt-get autoclean
+
+RUN wget -O /tmp/hstr-2.5.0-tarball.tgz https://github.com/dvorka/hstr/releases/download/2.5/hstr-2.5.0-tarball.tgz && \
+    tar -C /tmp -xf /tmp/hstr-2.5.0-tarball.tgz && \
+    cd /tmp/hstr  && \
+    ./configure && make && make install && \
+    rm -rf /tmp/hstr-2.5.0-tarball.tgz /tmp/hstr
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
