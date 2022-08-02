@@ -120,6 +120,14 @@ RUN wget -O /tmp/hstr-2.5.0-tarball.tgz https://github.com/dvorka/hstr/releases/
     ./configure && make && make install && \
     rm -rf /tmp/hstr-2.5.0-tarball.tgz /tmp/hstr
 
+
+RUN apt-get update && \
+    apt-get install -y \
+        python3.8 \
+        iproute2 && \
+    apt-get autoclean
+
+
 ########################################################################
 ## use no-root user amd64
 ########################################################################
