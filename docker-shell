@@ -17,6 +17,9 @@ shared_display=:0
 distro=${2}
    cmd=${3}
 
+# host/bridge/...
+net=host
+
 if [ $# == 0 ]; then
 	#default arch and distro
 	arch=amd64
@@ -27,6 +30,7 @@ fi
 docker run --rm \
 	-it \
 	--privileged \
+	--network ${net} \
 	-e DISPLAY=${shared_display} \
 	-e USER=$(id -un) \
 	-e HOME=${shared_home} \
