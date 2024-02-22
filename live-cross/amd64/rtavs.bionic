@@ -93,7 +93,8 @@ RUN apt-get install -y \
         python-pyelftools && \
     apt-get autoclean
 
-
+###################################################################################
+########################## AML toolchian ##########################################
 # add i386 depend
 RUN dpkg --add-architecture i386
 RUN apt-get update && \
@@ -107,6 +108,14 @@ RUN wget -O /tmp/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz https://re
 RUN wget -O /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-elf/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz && \
     tar -C /opt -xf /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz && \
     rm /tmp/gcc-linaro-7.3.1-2018.05-i686_aarch64-elf.tar.xz
+
+RUN wget -O /tmp/gcc-linaro-6.3.1-2017.02-x86_64_arm-linux-gnueabihf.tar.xz https://releases.linaro.org/components/toolchain/binaries/6.3-2017.02/arm-linux-gnueabihf/gcc-linaro-6.3.1-2017.02-x86_64_arm-linux-gnueabihf.tar.xz && \
+    tar -C /opt -xf /tmp/gcc-linaro-6.3.1-2017.02-x86_64_arm-linux-gnueabihf.tar.xz && \
+    rm /tmp/gcc-linaro-6.3.1-2017.02-x86_64_arm-linux-gnueabihf.tar.xz
+
+RUN apt-get install gcc-arm-none-eabi && apt-get autoclean
+
+##################################################################################
 
 # for hstr
 RUN apt-get install -y \
