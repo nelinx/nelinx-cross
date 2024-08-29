@@ -4,7 +4,7 @@
 #
 # To build the environment invoke
 #
-# $ docker build -t bionic:amd64 -f amd64/Dockerfile.jammy .
+# $ docker build -t jammy:amd64 -f amd64/rtavs.jammy .
 #
 # This creates a docker image called "<distro>:<arch>". Note that it will
 # take a while if you are building this image the first time.
@@ -72,9 +72,13 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-#RUN apt-get install -y \
-#        python && \
-#    apt-get autoclean
+RUN apt-get install -y \
+        python2 \
+        python3 && \
+    apt-get autoclean
+
+# use python2 as default python verson?
+RUN ln -s /usr/bin/python2 /usr/bin/python
 
 #RUN apt-get install -y \
 #        qt5-default \
@@ -134,22 +138,25 @@ ENV LANG=en_US.UTF-8 \
 ## use no-root user amd64
 ########################################################################
 
-# create cross-build user amd64
-RUN useradd -c 'cross-build-user' -m -d /home/amd64 -s /bin/bash amd64
-RUN usermod -a -G sudo amd64
-RUN usermod -a -G dialout amd64
-RUN usermod -a -G video amd64
+# build time default username and home
+# can be override by docker run environment variables
+ENV USER build
+ENV HOME /home/build
 
-# default username, can be override by docker run environment variables
-ENV USER=amd64 \
-    HOME=/home/amd64
+# create cross-build user build
+RUN useradd -c 'cross-builder' -m -d $HOME -s /bin/bash $USER
+RUN usermod -a -G sudo $USER
 
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i -e \
       's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
       /etc/sudoers
 
-USER amd64
+#Enable passwordless sudo for users
+RUN echo "$USER ALL=NOPASSWD:ALL" >> /etc/sudoers
+
+# dont remove this
+USER build
 
 RUN git config --global user.email "camus@rtavs.com"
 RUN git config --global user.name "Kaspter Ju"
