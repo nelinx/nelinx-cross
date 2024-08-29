@@ -80,6 +80,15 @@ RUN apt-get install -y \
 # use python2 as default python verson?
 RUN ln -s /usr/bin/python2 /usr/bin/python
 
+RUN apt-get install -y \
+        net-tools \
+        iputils-ping \
+        iproute2 && \
+    apt-get autoclean
+
+
+
+
 #RUN apt-get install -y \
 #        qt5-default \
 #        libsdl2-dev \
