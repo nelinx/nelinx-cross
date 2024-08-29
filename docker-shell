@@ -6,8 +6,8 @@ set -ex
 # usage docker-shell <arch> <distro> [cmd]
 
 # shared volume
-shared_repo=/Repos
-shared_data=/Data
+shared_repo=/repos
+shared_data=/data
 shared_home=${HOME}
 shared_misc=/misc
 shared_opt=/opt
@@ -17,15 +17,14 @@ shared_display=:0
 distro=${2}
    cmd=${3}
 
-# host/bridge/...
-net=host
+# same as host network
+net=host  # host/bridge/...
 
 if [ $# == 0 ]; then
 	#default arch and distro
 	arch=amd64
-	distro=bionic
+	distro=jammy
 fi
-
 
 docker run --rm \
 	-it \
@@ -34,7 +33,6 @@ docker run --rm \
 	-e DISPLAY=${shared_display} \
 	-e USER=$(id -un) \
 	-e HOME=${shared_home} \
-	-u $(id -u):$(id -g) \
 	-h ${distro} \
 	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 	-v /etc/passwd:/etc/passwd:ro \
