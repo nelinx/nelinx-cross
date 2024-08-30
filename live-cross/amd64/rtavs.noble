@@ -1,0 +1,167 @@
+# Dockerfile for building a cross developing environment.
+#
+# (c) 2017-2018 by Kaspter Ju <camus@rtavs.com>
+#
+# To build the environment invoke
+#
+# $ docker build -t noble:amd64 -f amd64/rtavs.noble .
+#
+# This creates a docker image called "<distro>:<arch>". Note that it will
+# take a while if you are building this image the first time.
+#
+# Note that Docker requires a relatively recent Linux kernel.
+# 3.8 is the current minimum.
+#
+
+# ubuntu version: one of 24.04/22.04/18.04/16.04/noble/jammy/focal/binoic
+ARG VER="24.04"
+FROM ubuntu:${VER}
+
+MAINTAINER Kaspter Ju "camus@rtavs.com"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
+
+#RUN echo "deb http://mirrors.163.com/ubuntu/ jammy main restricted universe multiverse" > /etc/apt/sources.list
+#RUN echo "deb http://mirrors.163.com/ubuntu/ jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
+#RUN echo "deb http://mirrors.163.com/ubuntu/ jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list
+#RUN echo "deb http://mirrors.163.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list
+
+#RUN sed -i -e 's/^APT/# APT/' -e 's/^DPkg/# DPkg/' \
+#      /etc/apt/apt.conf.d/docker-clean
+
+RUN apt-get update && \
+    apt-get install -y \
+       autoconf \
+       bash-completion \
+       bc \
+       bison \
+       build-essential \
+       ccache \
+       cmake \
+       curl \
+       cpio \
+       device-tree-compiler \
+       dosfstools \
+       flex \
+       git \
+       gperf \
+       gnupg \
+       hstr \
+       libncurses5-dev \
+       libgl1-mesa-dev \
+       libxml2-utils \
+       libssl-dev  \
+       locales \
+       lunzip \
+       mtools \
+       parted \
+       pkg-config \
+       rsync \
+       sudo  \
+       unzip \
+       vim \
+       wget \
+       zip \
+       zlib1g-dev && \
+    apt-get autoclean
+
+RUN locale-gen en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+RUN apt-get install -y \
+        python3 && \
+    apt-get autoclean
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN apt-get install -y \
+        net-tools \
+        iputils-ping \
+        iproute2 && \
+    apt-get autoclean
+
+
+#RUN apt-get install -y \
+#        qt5-default \
+#        libsdl2-dev \
+#    && apt-get autoclean
+
+# install gstreamer dev etc
+#RUN apt-get install -y \
+#        gstreamer1.0-tools \
+#        gstreamer1.0-plugins-good \
+#        gstreamer1.0-plugins-base \
+#        gstreamer1.0-plugins-bad \
+#        gstreamer1.0-plugins-ugly \
+#        gstreamer1.0-libav \
+#        libgstreamer1.0-dev \
+#        libgstrtspserver-1.0-dev \
+#        libgstreamer-plugins-base1.0-dev \
+#        libgstreamer-plugins-good1.0-dev \
+#    && apt-get autoclean
+
+# install ffmpeg etc
+#RUN apt-get install -y \
+#        libavcodec-dev \
+#        libavdevice-dev \
+#        libavfilter-dev \
+#        libavformat-dev \
+#        libavresample-dev \
+#        libavutil-dev \
+#    && apt-get autoclean
+
+
+# install cross build toolchain
+#RUN apt-get install -y \
+#    crossbuild-essential-armhf \
+#    crossbuild-essential-arm64
+
+# install live-build and debootstrap
+#RUN apt-get install -y \
+#        debootstrap \
+#        qemu-user-static \
+#        live-build && \
+#    apt-get autoclean
+
+# build atf
+#RUN apt-get install -y \
+#        gcc-arm-none-eabi && \
+#    apt-get autoclean
+
+
+# build uboot.its
+#RUN apt-get install -y \
+#        python-pyelftools && \
+#    apt-get autoclean
+
+
+########################################################################
+## use no-root user amd64
+########################################################################
+
+# build time default username and home
+# can be override by docker run environment variables
+ENV USER build
+ENV HOME /home/build
+
+# create cross-build user build
+RUN useradd -c 'cross-builder' -m -d $HOME -s /bin/bash $USER
+RUN usermod -a -G sudo $USER
+
+# Enable passwordless sudo for users under the "sudo" group
+RUN sed -i -e \
+      's/%sudo\s\+ALL=(ALL\(:ALL\)\?)\s\+ALL/%sudo ALL=NOPASSWD:ALL/g' \
+      /etc/sudoers
+
+#Enable passwordless sudo for users
+RUN echo "$USER ALL=NOPASSWD:ALL" >> /etc/sudoers
+
+# dont remove this
+USER build
+
+RUN git config --global user.email "camus@rtavs.com"
+RUN git config --global user.name "Kaspter Ju"
