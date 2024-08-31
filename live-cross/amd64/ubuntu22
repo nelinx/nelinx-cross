@@ -4,7 +4,7 @@
 #
 # To build the environment invoke
 #
-# $ docker build -t jammy:amd64 -f amd64/rtavs.jammy .
+# $ docker build -t ubuntu22:amd64 -f amd64/ubuntu22 .
 #
 # This creates a docker image called "<distro>:<arch>". Note that it will
 # take a while if you are building this image the first time.
