@@ -2,10 +2,7 @@
 
 set -ex
 
-
-# usage docker-shell <arch> <distro> [cmd]
-
-# shared volume
+# Default shared volumes
 shared_repo=/repos
 shared_data=/data
 shared_home=${HOME}
@@ -13,36 +10,67 @@ shared_misc=/misc
 shared_opt=/opt
 shared_display=:0
 
-  arch=${1}
-distro=${2}
-   cmd=${3}
 
-# same as host network
-net=host  # host/bridge/...
+# Default values
+tag="amd64"
+version="ubuntu22"
+cmd=""
 
-if [ $# == 0 ]; then
-	#default arch and distro
-	arch=amd64
-	distro=jammy
-fi
+# Show help
+show_help() {
+    echo "Usage: $0 [-h|--help] [-t <tag>] [-v <vesion>] [-x <cmd>]"
+    echo "  -t <tag>     : CPU architecture (default: amd64)"
+    echo "  -v <version> : Linux distribution (default: ubuntu22)"
+    echo "  -x <cmd>     : Command to run inside the container (default: interactive shell)"
+    echo "  -h, --help   : Show this help message"
+    exit 0
+}
 
+# Parse command-line arguments
+while getopts ":t:v:x:h" opt; do
+    case ${opt} in
+        t )
+            tag=$OPTARG
+            ;;
+        v )
+            version=$OPTARG
+            ;;
+        x )
+            cmd=$OPTARG
+            ;;
+        h )
+            show_help
+            ;;
+        \? )
+            echo "Invalid option: -$OPTARG" >&2
+            show_help
+            ;;
+        : )
+            echo "Invalid option: -$OPTARG requires an argument" >&2
+            show_help
+            ;;
+    esac
+done
+shift $((OPTIND -1))
+
+# Docker run command
 docker run --rm \
-	-it \
-	--privileged \
-	--network ${net} \
-	-e DISPLAY=${shared_display} \
-	-e USER=$(id -un) \
-	-e HOME=${shared_home} \
-	-h ${distro} \
-	-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-	-v /etc/passwd:/etc/passwd:ro \
-	-v /etc/group:/etc/group:ro \
-	-v /etc/shadow:/etc/shadow:ro \
-	-v /etc/sudoers.d:/etc/sudoers.d:ro \
-	-v ${shared_repo}:${shared_repo} \
-	-v ${shared_data}:${shared_data} \
-	-v ${shared_home}:${shared_home} \
-	-v ${shared_misc}:${shared_misc} \
-	-v ${shared_opt}:${shared_opt} \
-	-w ${PWD} \
-	${distro}:${arch} ${cmd}
+    -it \
+    --privileged \
+    --network host \
+    -e DISPLAY="${shared_display}" \
+    -e USER="$(id -un)" \
+    -e HOME="${shared_home}" \
+    -h "${version}" \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v /etc/group:/etc/group:ro \
+    -v /etc/shadow:/etc/shadow:ro \
+    -v /etc/sudoers.d:/etc/sudoers.d:ro \
+    -v "${shared_repo}:${shared_repo}" \
+    -v "${shared_data}:${shared_data}" \
+    -v "${shared_home}:${shared_home}" \
+    -v "${shared_misc}:${shared_misc}" \
+    -v "${shared_opt}:${shared_opt}" \
+    -w "$(pwd)" \
+    "${version}:${tag}" ${cmd}
