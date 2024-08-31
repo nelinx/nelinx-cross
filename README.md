@@ -3,7 +3,6 @@
 
 ## OS requirements
 
-* xenial 16.04 (LTS)
 * docker
 * qemu-user-static
 * binfmt-support
@@ -21,24 +20,31 @@ Run `/etc/rc.local` or restart system.
 
 ## Build cross-build enviroment.
 
+Build all image
+
 ```bash
-cd live-cross
-make
+docker-build
+```
+
+Build single image
+
+```bash
+docker-build -a amd64 -v ubuntu22 -t name
 ```
 
 ## Build application and other
 
-Enter arm64 shell and build application
+Enter arm64@ubuntu18 shell and build application
 
 ```bash
-make arm64
+docker-shell -t arm64 -v ubuntu18
 ```
 
 
-Enter amd64 shell and build u-boot/kernel/rootfs etc
+Enter amd64@ubuntu22 shell and build u-boot/kernel/rootfs etc
 
 ```bash
-make amd64
+docker-shell -t amd64 -v ubuntu22
 ```
 
 ## Others
