@@ -1,0 +1,107 @@
+#!/bin/bash
+
+set -ex
+
+# Arch and Ubuntu version arrays
+ARCHS=("amd64" "arm32" "arm64")
+VERSIONS=("ubuntu18" "ubuntu20" "ubuntu22" "ubuntu24")
+
+LOGFILE="build.log"
+
+# Clear the log file
+> "$LOGFILE"
+
+# Default values
+TAG=""
+ARCH=""
+VERSION=""
+
+# Parse command-line options
+while getopts ":t:a:v:" opt; do
+    case ${opt} in
+        t )
+            TAG=$OPTARG
+            ;;
+        a )
+            ARCH=$OPTARG
+            ;;
+        v )
+            VERSION=$OPTARG
+            ;;
+        \? )
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        : )
+            echo "Invalid option: -$OPTARG requires an argument" >&2
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND -1))
+
+# Build image function
+build_image() {
+    local arch=$1
+    local version=$2
+    local tag=$3
+
+    tag=${tag:-$arch}  # Use the provided tag or default to arch
+
+    echo "Building ${version}:${tag} environment..."
+    docker build -q -t "${version}:${tag}" -f "live-cross/${arch}/${version}" . >> "$LOGFILE" 2>&1
+    if [[ $? -ne 0 ]]; then
+        echo "Failed to build ${version}:${tag} environment" | tee -a "$LOGFILE" >&2
+        return 1
+    else
+        echo "Successfully built ${version}:${tag} environment" >> "$LOGFILE"
+    fi
+}
+
+# Build function for each architecture
+build_arch() {
+    local arch=$1
+    local tag=$2
+
+    for version in "${VERSIONS[@]}"; do
+        build_image "$arch" "$version" "$tag" &
+    done
+    wait  # Wait for all parallel builds to complete
+}
+
+# Build all architectures
+build_all() {
+    local tag=$1
+
+    for arch in "${ARCHS[@]}"; do
+        build_arch "$arch" "$tag"
+    done
+}
+
+# Build single image
+build_single_image() {
+    local arch=$1
+    local version=$2
+    local tag=$3
+
+    if [[ " ${ARCHS[@]} " =~ " ${arch} " ]] && [[ " ${VERSIONS[@]} " =~ " ${version} " ]]; then
+        build_image "$arch" "$version" "$tag"
+    else
+        echo "Invalid arch or Ubuntu version: ${arch} ${version}" | tee -a "$LOGFILE" >&2
+    fi
+}
+
+# Main script logic
+if [ -z "$ARCH" ] && [ -z "$VERSION" ]; then
+    # No architecture or version specified
+    build_all "$TAG"
+else
+    if [ -n "$ARCH" ] && [ -n "$VERSION" ]; then
+        # Single build
+        build_single_image "$ARCH" "$VERSION" "$TAG"
+    else
+        echo "Both architecture and version must be specified for a single build" | tee -a "$LOGFILE" >&2
+        echo "Usage: $0 [-t <tag>] [-a <arch>] [-v <version>] [all|single]" | tee -a "$LOGFILE" >&2
+        exit 1
+    fi
+fi
